@@ -25,12 +25,15 @@ SECRET_KEY = '07l-%7k50xwzct%#ca=+vu6r=%vbra5%v@xnqtam756_htdktc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ananke.asuscomm.com']
+ALLOWED_HOSTS = ['ananke.asuscomm.com', '192.168.1.50']
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'steelsensor.apps.SteelsensorConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

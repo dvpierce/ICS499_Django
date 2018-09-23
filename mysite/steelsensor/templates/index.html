@@ -1,0 +1,44 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>I learned HTML in the '90s.</title>
+</head>
+
+<body>
+
+{% if user.is_authenticated %}
+
+<p>Congratulations! You are an authenticated user, {{ user.username }} !</p>
+
+{% else %}
+
+<p>You are a stranger!</p>
+
+{% endif %}
+
+<p>This is static text outside of any template block. It will always be here.</p>
+
+<p><blink>I miss blink tags.</blink></p>
+
+<form action="{% url "list" %}" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p>{{ form.non_field_errors }}</p>
+	<p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+	<p>
+		{{ form.docfile.errors }}
+		{{ form.docfile }}
+	</p>
+	<p><input type="submit" value="Upload"/></p>
+</form>
+
+{% if documents %}
+	<ul>
+	{% for document in documents %}
+		<li><a href="{{ document.docfile.url }}">{{ document.docfile.name }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	<p>No files uploaded.</p>
+{% endif %}
+
+</body></html>
