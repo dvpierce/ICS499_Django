@@ -11,7 +11,22 @@ from steelsensor.forms import DocumentForm
 # Create your views here.
 
 def index(request):
-	return HttpResponse("Hello, world! You're at the steelsensor index!")
+	# Handle file upload
+	if request.method == 'POST':
+		form = DocumentForm(request.POST, request.FILES)
+		if form.is_valid():
+			newdoc = StoredImage(docfile = request.FILES['docfile'])
+			newdoc.save()
+
+			# Redirect to the document list after POST
+			return HttpResponseRedirect(reverse('index'))
+	else:
+		form = DocumentForm() # A empty, unbound form
+
+	# Load documents for the list page
+	documents = StoredImage.objects.all()
+	# Render list page with the documents and the form
+	return render(request, 'index.html', {'documents': documents, 'form': form})
 
 def results(request):
 	return HttpResponse("This is a results page view placeholder.")
@@ -22,20 +37,3 @@ def admintools(request):
 	else:
 		return HttpResponse("You're a stranger.")
 
-def list(request):
-	# Handle file upload
-	if request.method == 'POST':
-		form = DocumentForm(request.POST, request.FILES)
-		if form.is_valid():
-			newdoc = StoredImage(docfile = request.FILES['docfile'])
-			newdoc.save()
-
-			# Redirect to the document list after POST
-			return HttpResponseRedirect(reverse('list'))
-	else:
-		form = DocumentForm() # A empty, unbound form
-
-	# Load documents for the list page
-	documents = StoredImage.objects.all()
-	# Render list page with the documents and the form
-	return render(request, 'index.html', {'documents': documents, 'form': form})

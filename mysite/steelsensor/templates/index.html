@@ -10,9 +10,13 @@
 
 <p>Congratulations! You are an authenticated user, {{ user.username }} !</p>
 
+<p><a href="{% url 'logout' %}">log out</a></p>
+
 {% else %}
 
 <p>You are a stranger!</p>
+
+<p><a href="{% url 'login' %}">log in</a></p>
 
 {% endif %}
 
@@ -20,7 +24,7 @@
 
 <p><blink>I miss blink tags.</blink></p>
 
-<form action="{% url "list" %}" method="post" enctype="multipart/form-data">
+<form action="{% url "index" %}" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	<p>{{ form.non_field_errors }}</p>
 	<p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
