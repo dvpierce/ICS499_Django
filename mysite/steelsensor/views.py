@@ -6,30 +6,35 @@ from django.template import RequestContext
 from django.urls import reverse
 
 from steelsensor.models import StoredImage
+from steelsensor.models import ImageModel
 from steelsensor.forms import DocumentForm
+
+import os
+
+from steelsensor.matcher import match
+from PIL import Image
+from imagehash import whash, hex_to_hash
 
 # Create your views here.
 
 def index(request):
-	# Handle file upload
+	form = DocumentForm()
+	documents = []
+	return render(request, 'index.html', {'documents': documents, 'form': form})
+
+def results(request):
 	if request.method == 'POST':
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
 			newdoc = StoredImage(docfile = request.FILES['docfile'])
 			newdoc.save()
-
-			# Redirect to the document list after POST
-			return HttpResponseRedirect(reverse('index'))
+			imageHashValue = whash(Image.open("media"+os.path.sep+newdoc.docfile.name))
+			newImageModel = ImageModel(path = newdoc.docfile.name, hash = str(imageHashValue))
+			newImageModel.save()
+		results = match(newdoc, 30)
 	else:
-		form = DocumentForm() # A empty, unbound form
-
-	# Load documents for the list page
-	documents = StoredImage.objects.all()
-	# Render list page with the documents and the form
-	return render(request, 'index.html', {'documents': documents, 'form': form})
-
-def results(request):
-	return HttpResponse("This is a results page view placeholder.")
+		results = None
+	return render(request, 'results.html', {'results': results})
 
 def admintools(request):
 	if request.user.is_authenticated:

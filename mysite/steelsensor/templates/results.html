@@ -20,29 +20,17 @@
 
 {% endif %}
 
-<p>This is static text outside of any template block. It will always be here.</p>
 
-<p><blink>I miss blink tags.</blink></p>
 
-<form action="{% url "index" %}" method="post" enctype="multipart/form-data">
-	{% csrf_token %}
-	<p>{{ form.non_field_errors }}</p>
-	<p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
-	<p>
-		{{ form.docfile.errors }}
-		{{ form.docfile }}
-	</p>
-	<p><input type="submit" value="Upload"/></p>
-</form>
-
-{% if documents %}
+{% if results %}
 	<ul>
-	{% for document in documents %}
-		<li><a href="{{ document.docfile.url }}">{{ document.docfile.name }}</a></li>
+	{% for result in results %}
+		<li><a href="/media/{{ result.path }}"><img src="/media/{{ result.path }}" width=100px><BR>
+		{{ result.hash }}</a></li>
 	{% endfor %}
 	</ul>
 {% else %}
-	<p>No files uploaded.</p>
+	<p>No Results.</p>
 {% endif %}
 
 </body></html>
