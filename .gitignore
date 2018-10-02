@@ -1,4 +1,4 @@
-media/*
+mysite/media/*
 db.sqlite3
 *__pycache__*
 mysite/steelsensor/migrations/*
