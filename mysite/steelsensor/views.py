@@ -5,11 +5,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.urls import reverse
 
-from steelsensor.models import StoredImage
 from steelsensor.models import ImageModel
 from steelsensor.forms import DocumentForm
 
 import os
+import sys
 
 from steelsensor.matcher import match
 from PIL import Image
@@ -26,15 +26,27 @@ def results(request):
 	if request.method == 'POST':
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
-			newdoc = StoredImage(docfile = request.FILES['docfile'])
-			newdoc.save()
-			imageHashValue = whash(Image.open("media"+os.path.sep+newdoc.docfile.name))
-			newImageModel = ImageModel(path = newdoc.docfile.name, hash = str(imageHashValue))
+			# Create thing and save file.
+			thisDocfile = request.FILES['docfile']
+			newImageModel = ImageModel(docfile = thisDocfile)
 			newImageModel.save()
-		results = match(newdoc, 30)
+
+			imageHashValue = whash(Image.open(newImageModel.docfile.path))
+
+			print(newImageModel.docfile.path)
+			# Add filename and hash
+			newImageModel.path = thisDocfile.name
+			newImageModel.hash = str(imageHashValue)
+			newImageModel.save()
+
+		results = match(newImageModel, 30)
 	else:
-		results = None
-	return render(request, 'results.html', {'results': results})
+		results = []
+	return render(request, 'results.html', {'results': [x.docfile.path.split(os.getcwd())[1] for x in results]})
+
+def browse(request):
+	documents = ImageModel.objects.all()
+	return render(request, 'browse.html', {'documents': [ x.docfile.path.split(os.getcwd())[1] for x in documents ] } )
 
 def admintools(request):
 	if request.user.is_authenticated:

@@ -20,9 +20,9 @@
 
 {% endif %}
 
-<p>This is static text outside of any template block. It will always be here.</p>
+<p>SteelSensor Search Page</p>
 
-<p><blink>I miss blink tags.</blink></p>
+<p>Upload an image to compare. It will be added to the database.</p>
 
 <form action="{% url "results" %}" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
@@ -35,14 +35,6 @@
 	<p><input type="submit" value="Upload"/></p>
 </form>
 
-{% if documents %}
-	<ul>
-	{% for document in documents %}
-		<li><a href="{{ document.docfile.url }}">{{ document.docfile.name }}</a></li>
-	{% endfor %}
-	</ul>
-{% else %}
-	<p>No files uploaded.</p>
-{% endif %}
+<p><a href="/steelsensor/browse">Browse Images</a></p>
 
 </body></html>

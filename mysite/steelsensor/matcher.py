@@ -1,6 +1,6 @@
 from PIL import Image
 from imagehash import whash, hex_to_hash
-from steelsensor.models import StoredImage, ImageModel
+from steelsensor.models import ImageModel
 import os
 
 # Matcher - takes a StoredImage object and a float "maxDiff" and

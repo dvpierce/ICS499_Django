@@ -25,12 +25,14 @@
 {% if results %}
 	<ul>
 	{% for result in results %}
-		<li><a href="/media/{{ result.path }}"><img src="/media/{{ result.path }}" width=100px><BR>
-		{{ result.hash }}</a></li>
+		<li><a href="{{ result }}"><img src="{{ result }}" width=100px></a></li>
 	{% endfor %}
 	</ul>
 {% else %}
-	<p>No Results.</p>
+	<p>No results or no image posted.</p>
+	<p><a href="/steelsensor">Go Home</a></p>
 {% endif %}
+
+<p><a href="/steelsensor">Go Home</a></p>
 
 </body></html>

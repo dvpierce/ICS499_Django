@@ -8,10 +8,14 @@ import os
 
 class ImageModel(models.Model):
 	hash = models.CharField(max_length=16)
-	path = models.TextField()
+	path = models.TextField(primary_key=True)
+	docfile = models.FileField(
+		upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d',
+		null=True
+	)
 
-class StoredImage(models.Model):
-	docfile = models.FileField(upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d')
+#class StoredImage(models.Model):
+#	docfile = models.FileField(upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d')
 
 
 # maybe implement a custom field specifically for Hashes instead of as a string.
