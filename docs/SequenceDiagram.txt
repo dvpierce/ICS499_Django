@@ -1,0 +1,65 @@
+title SteelSensor - ICS499 Iteration 2
+
+note left of Controller: Request Index Page
+User->View: index(request) - GET
+View->User: return render(index.html)
+
+note left of Controller: Request Results Page
+User->View: results(request) - POST
+View->ImageModel: create ImageModel for submitted file
+ImageModel->Database: Save
+Database->ImageModel:
+ImageModel->Local File System: Save
+Local File System->ImageModel:
+ImageModel->View: return ImageModel
+View->Matcher: match(ImageModel, maxDiff)
+Matcher->ImageModel: Get Hash
+ImageModel->Matcher: 
+Matcher->Database: Find matching hashes
+Database->Matcher:
+Matcher->View: return list of matches
+View->User: return render(results.html)
+
+note left of Controller: Request Browse Page
+User->View: browse(request) - POST
+View->Database: Request list of all images
+Database->View: Return list of all images
+View->User: return render(browse.html)
+
+note left of Controller: Request dbcreate
+opt HTTP Request Method GET
+    User->View: dbcreate(request) - GET
+    View->User: return render(dbcreate) with form.
+end
+opt HTTP Request Method POST
+    User->View: dbcreate(request) - POST
+    View->Database: create new Database
+    Database->View:
+    View->User: return render(dbcreate) with success message
+end
+
+note left of Controller: Request dbdelete
+opt HTTP Request Method GET
+    User->View: dbdelete(request) - GET
+    View->User: return render(dbdelete) with form.
+end
+opt HTTP Request Method POST
+    User->View: dbdelete(request) - POST
+    View->Database: delete requested database and associated images.
+    Database->View:
+    View->User: return render(dbdelete) with success message
+end
+
+opt HTTP Request Method GET
+    User->View: deleteImages(request) - GET
+    View->Database: Find images owned by user
+    Database->View: Return images owned by user
+    View->User: return render(deleteImages) with list of owned images and selection form.
+end
+opt HTTP Request Method POST
+    User->View: deleteImages(request) - POST
+    View->Database: find and delete images selected in Form.
+    Database->Database: Verify ownership before deletion.
+    Database->View: return status
+    View->User: return render(deleteImages) with status message.
+end
