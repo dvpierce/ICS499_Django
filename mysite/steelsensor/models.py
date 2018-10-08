@@ -7,12 +7,19 @@ import os
 # Create your models here.
 
 class ImageModel(models.Model):
+	randomKey = models.TextField(primary_key=True, null=False)
 	hash = models.CharField(max_length=16)
-	path = models.TextField(primary_key=True)
+	path = models.TextField()
 	docfile = models.FileField(
 		upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d',
 		null=True
 	)
+	dbName = models.TextField(null=False, default="main")
+
+class UserDatabase(models.Model):
+	dbName = models.TextField(primary_key=True, null=False)
+	dbOwner = models.TextField(null=False, default='admin')
+
 
 #class StoredImage(models.Model):
 #	docfile = models.FileField(upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d')

@@ -32,6 +32,19 @@
 		{{ form.docfile.errors }}
 		{{ form.docfile }}
 	</p>
+
+	{% if databases %}
+		<p>
+		<select name="dbSelect">
+       		 	{% for database in databases %}
+			<option value="{{ database }}">{{ database }}</option>
+		        {% endfor %}
+		</select>
+		</p>
+	{% else %}
+        	<p>No database selections avalailable.</p>
+	{% endif %}
+
 	<p><input type="submit" value="Upload"/></p>
 </form>
 

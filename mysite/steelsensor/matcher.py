@@ -7,12 +7,19 @@ import os
 # returns a list of ImageModels that match within maxDiff percent.
 def match(theImage, maxDiff):
 
-	theHash = whash(Image.open("media"+os.path.sep+theImage.docfile.name))
+	theHash = theImage.hash
+
+	# theHash = whash(Image.open("media"+os.path.sep+theImage.docfile.name))
+
 	results = []
 
-	imageHashes = ImageModel.objects.all()
-	for hash in imageHashes:
-		# print(hash.hash, hash.path)
-		results.append(hash)
-	# print(results)
+	allImages = ImageModel.objects.all()
+	for Image in allImages:
+		a = hex_to_hash(Image.hash)
+		b = hex_to_hash(theHash)
+		difference = 100*(a - b)/(len(a.hash)**2)
+		#print(difference)
+		if(difference < maxDiff):
+			results.append(Image)
+	#print(results)
 	return results
