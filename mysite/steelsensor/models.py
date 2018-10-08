@@ -16,6 +16,10 @@ class ImageModel(models.Model):
 	)
 	dbName = models.TextField(null=False, default="main")
     
+    # Constructor - implement this later. It's important from a proper OO standpoint.
+    # def __init__(self, randomKey, path, hash, docfile, dbName):
+        
+    
     # Matcher - match the object against the images in the database and
     # return a list of ImageModels that match within maxDiff percent.
     def findMatches(self, maxDiff):
