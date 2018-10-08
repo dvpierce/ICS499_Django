@@ -40,7 +40,10 @@ class ImageModel(models.Model):
 class UserDatabase(models.Model):
 	dbName = models.TextField(primary_key=True, null=False)
 	dbOwner = models.TextField(null=False, default='admin')
-
+    
+    def __init__(self, dbName, dbOwner):
+        self.dbName = dbName
+        self.dbOwner = dbOwner
 
 #class StoredImage(models.Model):
 #	docfile = models.FileField(upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d')
