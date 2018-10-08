@@ -15,6 +15,23 @@ class ImageModel(models.Model):
 		null=True
 	)
 	dbName = models.TextField(null=False, default="main")
+    
+    # Matcher - match the object against the images in the database and
+    # return a list of ImageModels that match within maxDiff percent.
+    def findMatches(self, maxDiff):
+
+        theHash = self.hash
+
+        results = []
+        allImages = ImageModel.objects.all()
+        for Image in allImages:
+            a = hex_to_hash(Image.hash)
+            b = hex_to_hash(theHash)
+            difference = 100*(a - b)/(len(a.hash)**2)
+            if(difference < maxDiff):
+                results.append(Image)
+        return results
+
 
 class UserDatabase(models.Model):
 	dbName = models.TextField(primary_key=True, null=False)

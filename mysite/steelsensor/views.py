@@ -12,7 +12,6 @@ import os
 import sys
 import random
 
-from steelsensor.matcher import match
 from PIL import Image
 from imagehash import whash, hex_to_hash
 
@@ -70,7 +69,7 @@ def results(request):
 		else:
 			return render(request, 'error.html', {'errorCode': "Invalid Form Received." })
 
-		results = match(newImageModel, 30)
+		results = newImageModel.findMatches(30)
 	else:
 		results = []
 	return render(request, 'results.html', {'results': [x.docfile.path.split(os.getcwd())[1] for x in results]})
