@@ -51,7 +51,7 @@ def results(request):
 
 			# Create thing and save file.
 			thisDocfile = request.FILES['docfile']
-			newImageModel = ImageModel(docfile = thisDocfile, dbName = request.POST['dbSelect'][0], path = thisDocfile.name)
+			newImageModel = ImageModel(docfile = thisDocfile, dbName = request.POST['dbSelect'], path = thisDocfile.name)
 
 			# Check file name against allowed formats.
 			if thisDocfile.name.split('.')[-1].lower() not in ValidFileTypes:
