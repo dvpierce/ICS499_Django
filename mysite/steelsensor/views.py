@@ -48,18 +48,16 @@ def results(request):
 	if request.method == 'POST':
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
-			# Generate random number to use as primary key.
-			hash = random.getrandbits(128)
-			hash = "%032x" % hash
+
 			# Create thing and save file.
 			thisDocfile = request.FILES['docfile']
-			newImageModel = ImageModel(docfile = thisDocfile)
-			newImageModel.path = thisDocfile.name
-			newImageModel.randomKey = hash
-			newImageModel.dbName = request.POST['dbSelect'][0]
+			newImageModel = ImageModel(docfile = thisDocfile, dbName = request.POST['dbSelect'][0], path = thisDocfile.name)
+
 			# Check file name against allowed formats.
-			if thisDocfile.name.split(',')[-1].lower() not in ValidFileTypes:
+			if thisDocfile.name.split('.')[-1].lower() not in ValidFileTypes:
+				print("Invalid file type submitted.")
 				return render(request, 'error.html', {'errorCode': "Invalid File Type: " + thisDocfile.name.split('.')[-1] })
+
 			newImageModel.save()
 
 			# Add image hash
