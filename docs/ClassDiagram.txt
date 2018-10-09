@@ -1,0 +1,40 @@
+@startuml
+
+title SteelSensor (ICS499 Project) Class Diagram
+
+
+class ImageModel {
+  .. Members ..
+  -id: Integer AutoField (unique, primary_key)
+  +hash: CharField (max_length=16)
+  +path: CharField
+  +docfile: CharField
+  +dbName: CharField
+
+  .. Methods ..
+  findMatches(maxDiff):
+}
+
+class User {
+  .. Members ..
+  +username: CharField (unique)
+  +password: CharField
+  +email: CharField
+  +is_superuser: Boolean
+  
+  .. Methods ..
+}
+
+class UserDatabase {
+    .. Members ..
+    +dbName: String
+    +dbOwner: String
+
+    .. Methods ..
+}
+
+ImageModel "1..*" o--right--o "1" UserDatabase
+ImageModel <-up- "Creates/Uploads" User
+UserDatabase <-up- "Owns" User
+
+@enduml
