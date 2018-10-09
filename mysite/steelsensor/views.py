@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.http import HttpResponse, HttpResponseRedirect
 
@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.urls import reverse
 
 from steelsensor.models import ImageModel, UserDatabase
-from steelsensor.forms import DocumentForm
+from steelsensor.forms import DocumentForm, dbCreateForm
 
 import os
 import sys
@@ -84,6 +84,20 @@ def admintools(request):
 
 
 def dbcreate(request):
+	if request.method == "POST":
+		form = dbCreateForm(request.POST)
+		print("Reading form data.")
+		print(form)
+		if form.is_valid():
+			print("Form is valid. Create UserDatabase object.")
+			print(request.POST['NewdbName'], request.user)
+			newDatabase = UserDatabase(dbName = request.POST['NewdbName'], dbOwner = request.user.username)
+			newDatabase.save()
+		return redirect('index')
+	else:
+		form = dbCreateForm()
+		return render(request, 'dbcreate.html', {'form':form})
+
 	return HttpResponse("<html><body><p>This is where we create databases. (Not yet implemented.)</p><p><a href=/steelsensor/>Go Home</a></p></body></html>")
 
 def dbdelete(request):

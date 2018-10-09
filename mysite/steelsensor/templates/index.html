@@ -45,6 +45,10 @@
         	<p>No database selections avalailable.</p>
 	{% endif %}
 
+	{% if user.is_authenticated %}
+	<p><a href="/steelsensor/dbcreate">Create a database if you'd like.</a></p>
+	{% endif %}
+
 	<p><input type="submit" value="Upload"/></p>
 </form>
 
