@@ -21,6 +21,15 @@
 {% endif %}
 
 
+<p>Original photo:</p>
+
+{% if original %}
+
+<p><img src="{{ original }}" width="200px"></p>
+
+{% endif %}
+
+<p>Matching Images:</p>
 
 {% if results %}
 	<ul>

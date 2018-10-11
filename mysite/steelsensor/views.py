@@ -46,6 +46,7 @@ def index(request):
 
 def results(request):
 	if request.method == 'POST':
+		dbMatchThreshold=30
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
 
@@ -64,13 +65,18 @@ def results(request):
 			imageHashValue = whash(Image.open(newImageModel.docfile.path))
 			newImageModel.hash = str(imageHashValue)
 			newImageModel.save()
+
+			# Retrieve dbMatchThreshold from form
+			dbMatchThreshold = int(request.POST['matchingThreshold'])
+			print("Matching threshold set to:", dbMatchThreshold)
+
 		else:
 			return render(request, 'error.html', {'errorCode': "Invalid Form Received." })
 
-		results = newImageModel.findMatches(30)
+		results = newImageModel.findMatches(dbMatchThreshold)
 	else:
 		results = []
-	return render(request, 'results.html', {'results': [x.docfile.path.split(os.getcwd())[1] for x in results]})
+	return render(request, 'results.html', {'original' : newImageModel.docfile.path.split(os.getcwd())[1], 'results': [x.docfile.path.split(os.getcwd())[1] for x in results]})
 
 def browse(request):
 	documents = ImageModel.objects.all()
