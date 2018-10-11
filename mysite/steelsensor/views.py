@@ -67,8 +67,13 @@ def results(request):
 			newImageModel.save()
 
 			# Retrieve dbMatchThreshold from form
-			dbMatchThreshold = int(request.POST['matchingThreshold'])
-			print("Matching threshold set to:", dbMatchThreshold)
+			try:
+				dbMatchThreshold = int(request.POST['matchingThreshold'])
+				# print("Matching threshold set to:", dbMatchThreshold)
+			except:
+				# We'll get a Matching Error thrown if the form didn't include a matchingThreshold (unauthenticated user.)
+				# This is fine but we still need to catch/ignore the error.
+				pass
 
 		else:
 			return render(request, 'error.html', {'errorCode': "Invalid Form Received." })
@@ -80,12 +85,12 @@ def results(request):
 
 def browse(request):
 	documents = ImageModel.objects.all()
-	print( [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] )
+	# print( [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] )
 	return render(request, 'browse.html', {'documents': [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] } )
 
 def browsematches(request):
 	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
-	print(searchImage)
+	# print(searchImage)
 	matches = searchImage.findMatches(30)
 
 	return render(request, 'browsematches.html', {'original' : searchImage.docfile.path.split(os.getcwd())[1], 'matches' : [ x.docfile.path.split(os.getcwd())[1] for x in matches ] })
@@ -107,8 +112,6 @@ def dbcreate(request):
 	else:
 		form = dbCreateForm()
 		return render(request, 'dbcreate.html', {'form':form})
-
-	return HttpResponse("<html><body><p>This is where we create databases. (Not yet implemented.)</p><p><a href=/steelsensor/>Go Home</a></p></body></html>")
 
 def dbdelete(request):
 	return HttpResponse("<html><body><p>This is where we delete databases. (Not yet implemented.)</p><p><a href=/steelsensor/>Go Home</a></p></body></html>")
