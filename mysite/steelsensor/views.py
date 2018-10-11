@@ -36,7 +36,7 @@ from imagehash import whash, hex_to_hash
 #
 ################################################################################
 
-ValidFileTypes = [ 'png', 'jpg', 'jpeg', 'gif' ]
+ValidFileTypes = [ 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'tiff' ]
 
 def index(request):
 	form = DocumentForm()
