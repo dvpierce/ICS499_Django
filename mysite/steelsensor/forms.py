@@ -6,3 +6,5 @@ class DocumentForm(forms.Form):
 
 class dbCreateForm(forms.Form):
 	NewdbName = forms.CharField(widget=forms.Textarea)
+
+

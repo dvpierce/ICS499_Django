@@ -20,13 +20,22 @@
 
 {% endif %}
 
-<p>SteelSensor Browse</p>
+<p>SteelSensor BrowseMatches</p>
 
-{% if documents %}
+<p>Original photo:</p>
+
+{% if original %}
+
+<p><img src="{{ original }}" width="100px"></p>
+
+{% endif %}
+
+<p>Matching Images:</p>
+
+{% if matches %}
 	<ul>
-	{% for document in documents %}
-		<li><a href="/media/{{ document }}"><img src="/media/{{ document }}" width="200px"></a><br>
-		<a href=/steelsensor/browsematches?imgURL={{ document }}>Show similar images</a></li>
+	{% for match in matches %}
+		<li><a href="{{ match }}"><img src="{{ match }}" width="200px"></a></li>
 	{% endfor %}
 	</ul>
 {% else %}

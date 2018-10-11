@@ -74,7 +74,15 @@ def results(request):
 
 def browse(request):
 	documents = ImageModel.objects.all()
-	return render(request, 'browse.html', {'documents': [ x.docfile.path.split(os.getcwd())[1] for x in documents ] } )
+	print( [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] )
+	return render(request, 'browse.html', {'documents': [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] } )
+
+def browsematches(request):
+	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
+	print(searchImage)
+	matches = searchImage.findMatches(30)
+
+	return render(request, 'browsematches.html', {'original' : searchImage.docfile.path.split(os.getcwd())[1], 'matches' : [ x.docfile.path.split(os.getcwd())[1] for x in matches ] })
 
 def admintools(request):
 	if request.user.is_authenticated:
@@ -86,11 +94,7 @@ def admintools(request):
 def dbcreate(request):
 	if request.method == "POST":
 		form = dbCreateForm(request.POST)
-		print("Reading form data.")
-		print(form)
 		if form.is_valid():
-			print("Form is valid. Create UserDatabase object.")
-			print(request.POST['NewdbName'], request.user)
 			newDatabase = UserDatabase(dbName = request.POST['NewdbName'], dbOwner = request.user.username)
 			newDatabase.save()
 		return redirect('index')
