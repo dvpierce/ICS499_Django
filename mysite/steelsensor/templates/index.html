@@ -50,16 +50,16 @@
 	{% if user.is_authenticated %}
 	<p><a href="/steelsensor/dbcreate">Create a database if you'd like.</a></p>
 
+	{% endif %}
 	<p>
 	<select name="matchingThreshold">
-		<option value="10">10%</option>
-		<option value="20">20%</option>
-		<option value="30">30%</option>
-		<option value="40">40%</option>
-		<option value="50">50%</option>
+		<option value="10">90% Match</option>
+		<option value="20">80% Match</option>
+		<option value="30">70% Match</option>
+		<option value="40">60% Match</option>
+		<option value="50">50% Match</option>
 	</select>
 	</p>
-	{% endif %}
 
 	<p><input type="submit" value="Upload"/></p>
 </form>
