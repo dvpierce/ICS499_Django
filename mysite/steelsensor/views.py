@@ -5,8 +5,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.urls import reverse
 
+from django.core.paginator import Paginator
+
 from steelsensor.models import ImageModel, UserDatabase
-from steelsensor.forms import DocumentForm, dbCreateForm
+from steelsensor.forms import DocumentForm, dbManageForm
 
 import os
 import sys
@@ -66,13 +68,9 @@ def results(request):
 			newImageModel.hash = str(imageHashValue)
 			newImageModel.save()
 
-			# Retrieve dbMatchThreshold from form
 			try:
 				dbMatchThreshold = int(request.POST['matchingThreshold'])
-				# print("Matching threshold set to:", dbMatchThreshold)
 			except:
-				# We'll get a Matching Error thrown if the form didn't include a matchingThreshold (unauthenticated user.)
-				# This is fine but we still need to catch/ignore the error.
 				pass
 
 		else:
@@ -81,19 +79,63 @@ def results(request):
 		results = newImageModel.findMatches(dbMatchThreshold)
 	else:
 		results = []
-	return render(request, 'results.html', {'original' : newImageModel.docfile.path.split(os.getcwd())[1], 'results': [x.docfile.path.split(os.getcwd())[1] for x in results]})
+	return render(request, 'results.html', {'original' : str(newImageModel.docfile), 'results': [ str(x.docfile) for x in results]})
 
 def browse(request):
-	documents = ImageModel.objects.all()
-	# print( [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] )
-	return render(request, 'browse.html', {'documents': [ x.docfile.path.split(os.getcwd()+"/media/")[1] for x in documents ] } )
+	page = request.GET.get('p', '')
+	maxPage = request.GET.get('count', '')
+	if page and maxPage:
+		try:
+			page = int(page)
+			maxPage = int(maxPage)
+		except:
+			page = 1
+			maxPage = 5
+	else:
+		page = 1
+		maxPage = 5
+
+	# Determine which images the current user should be allowed to view.
+	databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
+	if str(request.user) in "admin": databases.append("main")
+
+	allImages = ImageModel.objects.filter(dbName__in=databases)
+	pagedImages = Paginator(allImages, maxPage)
+
+	if (page < 1): page = 1
+	if (page > pagedImages.num_pages): page = pagedImages.num_pages
+
+	allImages = pagedImages.page(page)
+
+	if ( page < pagedImages.num_pages ):
+		nextPageLink = "?p=%d&count=%d" % ( page + 1, maxPage)
+	else:
+		nextPageLink = None
+	if ( page > 1 ):
+		prevPageLink = "?p=%d&count=%d" % ( page - 1, maxPage)
+	else:
+		prevPageLink = None
+
+	print(prevPageLink, page, nextPageLink)
+	return render(request, 'browse.html', {'documents': [ str(x.docfile) for x in allImages ], 'nextPageLink' : nextPageLink, 'prevPageLink' : prevPageLink, 'pageNum' : page } )
 
 def browsematches(request):
 	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
-	# print(searchImage)
-	matches = searchImage.findMatches(30)
+	results = searchImage.findMatches(30)
 
-	return render(request, 'browsematches.html', {'original' : searchImage.docfile.path.split(os.getcwd())[1], 'matches' : [ x.docfile.path.split(os.getcwd())[1] for x in matches ] })
+	return render(request, 'browsematches.html', {'original' : str(searchImage.docfile), 'matches' : [ str(x.docfile) for x in results ] })
+
+def deleteImage(request):
+	# Find the image requested
+	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
+	# Delete file from local file system
+	localPath = searchImage.docfile.path
+	os.remove(localPath)
+	print("Deleting " + localPath)
+	# Delete the imageModel
+	searchImage.delete()
+
+	return HttpResponse("<html><body><p>Deleted "+localPath+"</p><p><a href=/steelsensor/>Go Home</a></p><body></html>")
 
 def admintools(request):
 	if request.user.is_authenticated:
@@ -102,19 +144,25 @@ def admintools(request):
 		return HttpResponse("You're a stranger.")
 
 
-def dbcreate(request):
+def dbmanage(request):
 	if request.method == "POST":
-		form = dbCreateForm(request.POST)
+		form = dbManageForm(request.POST)
 		if form.is_valid():
 			newDatabase = UserDatabase(dbName = request.POST['NewdbName'], dbOwner = request.user.username)
 			newDatabase.save()
-		return redirect('index')
+		return redirect('dbmanage')
 	else:
-		form = dbCreateForm()
-		return render(request, 'dbcreate.html', {'form':form})
+		form = dbManageForm()
+		databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
+		return render(request, 'dbmanage.html', { 'form' : form, 'databases' : databases } )
+
 
 def dbdelete(request):
-	return HttpResponse("<html><body><p>This is where we delete databases. (Not yet implemented.)</p><p><a href=/steelsensor/>Go Home</a></p></body></html>")
+	dbToDelete = request.GET.get('db','')
+
+	print(dbToDelete)
+
+	return redirect('dbmanage')
 
 def deleteImages(request):
 	return HttpResponse("<html><body><p>This is where we let users delete images that they've uploaded. (Not yet implemented.)</p><p><a href=/steelsensor/>Go Home</a></p></body></html>")

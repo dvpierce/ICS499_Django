@@ -25,7 +25,7 @@
 
 {% if original %}
 
-<p><img src="{{ original }}" width="200px"></p>
+<p><img src="/media/{{ original }}" width="200px"></p>
 
 {% endif %}
 
@@ -34,7 +34,9 @@
 {% if results %}
 	<ul>
 	{% for result in results %}
-		<li><a href="{{ result }}"><img src="{{ result }}" width=200px></a></li>
+		<li><a href="/media/{{ result }}"><img src="/media/{{ result }}" width=200px></a></li>
+                <a href=/steelsensor/browsematches?imgURL={{ result }}>Show similar images</a>&nbsp;
+                <a href=/steelsensor/deleteImage?imgURL={{ result }}>Delete this image</a></li>
 	{% endfor %}
 	</ul>
 {% else %}

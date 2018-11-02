@@ -23,10 +23,22 @@
 <p>SteelSensor Browse</p>
 
 {% if documents %}
+	<p>
+	{% if prevPageLink %}
+		<a href=/steelsensor/browse{{ prevPageLink }}><---</a>&nbsp;
+	{% endif %}
+	{% if pageNum %}
+		{{ pageNum }}
+	{% endif %}
+	{% if nextPageLink %}
+		&nbsp;<a href=/steelsensor/browse{{ nextPageLink }}>---></a>
+	{% endif %}
+	</p>
 	<ul>
 	{% for document in documents %}
 		<li><a href="/media/{{ document }}"><img src="/media/{{ document }}" width="200px"></a><br>
-		<a href=/steelsensor/browsematches?imgURL={{ document }}>Show similar images</a></li>
+		<a href=/steelsensor/browsematches?imgURL={{ document }}>Show similar images</a>&nbsp;
+		<a href=/steelsensor/deleteImage?imgURL={{ document }}>Delete this image</a></li>
 	{% endfor %}
 	</ul>
 {% else %}
