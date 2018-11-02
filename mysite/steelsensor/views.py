@@ -84,6 +84,7 @@ def results(request):
 def browse(request):
 	page = request.GET.get('p', '')
 	maxPage = request.GET.get('count', '')
+	db = request.GET.get('db', '')
 	if page and maxPage:
 		try:
 			page = int(page)
@@ -96,8 +97,13 @@ def browse(request):
 		maxPage = 5
 
 	# Determine which images the current user should be allowed to view.
-	databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
-	if str(request.user) in "admin": databases.append("main")
+	# Or restrict to provided search pattern.
+
+	if db:
+		databases = [ db ]
+	else:
+		databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
+		if str(request.user) in "admin": databases.append("main")
 
 	allImages = ImageModel.objects.filter(dbName__in=databases)
 	pagedImages = Paginator(allImages, maxPage)
