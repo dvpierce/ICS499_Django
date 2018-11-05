@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.urls import reverse
 
 from django.core.paginator import Paginator
+from django.core.files.storage import FileSystemStorage
 
 from steelsensor.models import ImageModel, UserDatabase
 from steelsensor.forms import DocumentForm, dbManageForm
@@ -38,7 +39,7 @@ from imagehash import whash, hex_to_hash
 #
 ################################################################################
 
-ValidFileTypes = [ 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'tiff' ]
+ValidFileTypes = [ 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'tiff', 'zip' ]
 
 def index(request):
 	form = DocumentForm()
@@ -46,11 +47,32 @@ def index(request):
 	databases = [ "main" ] + [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
 	return render(request, 'index.html', {'documents': documents, 'form': form, 'databases': databases})
 
+def zipHandler(request):
+	dbName = request.POST['dbSelect']
+	zipFile = request.FILES['docfile']
+	fs = FileSystemStorage()
+	filename = fs.save(zipFile.name, zipFile)
+	print(filename)
+	print(fs.url(filename))
+	print(fs.location)
+	FileAbsPath = fs.location + os.path.sep + filename
+	print(FileAbsPath)
+	return
+
 def results(request):
 	if request.method == 'POST':
 		dbMatchThreshold=30
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
+
+			# Check if user has r/w permissions on database.
+			try:
+				requesteddbName = request.POST['dbSelect']
+				requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
+				# print(requesteddbName, request.user.username, requestedDB)
+			except:
+				return HttpResponse("<html><body><p>There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions.</p><p><a href=/steelsensor>Go Home.</a></p></body></html>" % requesteddbName)
+
 
 			# Create thing and save file.
 			thisDocfile = request.FILES['docfile']
@@ -58,8 +80,13 @@ def results(request):
 
 			# Check file name against allowed formats.
 			if thisDocfile.name.split('.')[-1].lower() not in ValidFileTypes:
-				print("Invalid file type submitted.")
+				# print("Invalid file type submitted.")
 				return render(request, 'error.html', {'errorCode': "Invalid File Type: " + thisDocfile.name.split('.')[-1] })
+
+			# Check for zip file.
+			if thisDocfile.name.split('.')[-1].lower() in 'zip':
+				zipHandler(request)
+				return HttpResponse("<p>File uploaded and images processed.</p><p><a href=/steelsensor/>Go Home</a></p>")
 
 			newImageModel.save()
 
@@ -122,7 +149,11 @@ def browse(request):
 	else:
 		prevPageLink = None
 
-	print(prevPageLink, page, nextPageLink)
+	if db:
+		if nextPageLink: nextPageLink += "&db="+db
+		if prevPageLink: prevPageLink += "&db="+db
+
+	# print(prevPageLink, page, nextPageLink)
 	return render(request, 'browse.html', {'documents': [ str(x.docfile) for x in allImages ], 'nextPageLink' : nextPageLink, 'prevPageLink' : prevPageLink, 'pageNum' : page } )
 
 def browsematches(request):
@@ -166,7 +197,7 @@ def dbmanage(request):
 def dbdelete(request):
 	dbToDelete = request.GET.get('db','')
 
-	print(dbToDelete)
+	# print(dbToDelete)
 
 	return redirect('dbmanage')
 
