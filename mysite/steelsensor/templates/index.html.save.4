@@ -1,0 +1,154 @@
+{% load sta{% load static %}
+<html>
+<head>
+        <meta charset="utf-8">
+        <title>Steel Sensor</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<div>
+        <h1>Steel Sensor</h1>
+        <h4> : A image comparison tool.</h4>
+</div>
+
+{% if user.is_authenticated %}
+
+<table class="topRight">
+        <tr>
+                <th><p class="greeting" >Hello {{ user.username }}!</p></th>
+                <th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th>
+        </tr>
+</table>
+
+
+{% else %}
+
+<table class="topRight">
+        <tr>
+                <th><input type="button" onclick="location.href='/accounts/register';" value="Sign-up" /></th>
+
+                <th><input type="button" onclick="location.href='{% url 'login' %}';" value="Sign-in" /></th>
+        </tr>
+</table>
+
+{% endif %}
+tic %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Steel Sensor</title>
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<div>
+	<h1>Steel Sensor</h1>
+	<h4> : A image comparison tool.</h4>
+</div>
+
+{% if user.is_authenticated %}
+
+<table class="topRight">
+        <tr>
+                <th><p class="greeting" >Hello {{ user.username }}!</p></th>
+		<th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th>
+	</tr>
+</table>
+
+
+{% else %}
+
+<table class="topRight">
+	<tr>
+		<th><input type="button" onclick="location.href='/accounts/register';" value="Sign-up" /></th>
+
+		<th><input type="button" onclick="location.href='{% url 'login' %}';" value="Sign-in" /></th>
+	</tr>
+</table>
+
+{% endif %}
+
+<!-- <p>SteelSensor Search Page</p> -->
+
+<br>
+
+<p>Click Select to choose an image to upload:</p>
+
+<form action="{% url "results" %}" method="post" enctype="multipart/form-data" align="center">
+	{% csrf_token %}
+	
+	<!-- <p>{{ form.non_field_errors }}</p>
+	<p>{{ form.docfile.label_tag }}</p>
+	*{{ form.docfile.help_text }} -->
+
+	<p>
+		{{ form.docfile.errors }}
+		{{ form.docfile }}
+	</p> 
+
+	{% if databases  %}
+		
+		<br>
+
+		<p> Select a Database: </p>
+		
+		<p>
+		<select name="dbSelect">
+       		 	{% for database in databases %}
+			<option value="{{ database }}">{{ database }}</option>
+		        {% endfor %}
+		</select>
+		</p>
+
+	{% else %}
+        	<p>No database selections avalailable.</p>
+	{% endif %}
+
+	<p>
+	
+	<br>
+	
+	<p>Choose the minimum percent match you are looking for:</p>
+
+	<div class="slidecontainer" align="center">
+		<input type="range" min="1" max="100" value="50" class="slider" name="myRange" id="myRange" oninput="matchingThreshold.value = myRange.value"></p>
+		<output name="matchingThreshold" id="matchingThreshold">50</output>
+	</div>
+
+	<p>
+	<!-- <select name="matchingThreshold">
+		<option value="0">100%</option> 
+		<option value="10">90%</option>
+		<option value="20">80%</option>
+		<option value="30">70%</option>
+		<option value="40">60%</option>
+		<option value="50">50%</option>
+		<option value="60">40%</option>
+		<option value="70">30%</option>
+		<option value="80">20%</option>
+		<option value="90">10%</option>
+		<option value="100">0%</option>
+	</select>
+	-->
+	</p>
+	
+	<br>
+
+	<p><input type="submit" value="Upload and Compare"/></p>
+</form>
+
+<br>
+<br>
+
+{% if user.is_authenticated %}
+
+       <p><input type="button" onclick="location.href='{% url 'dbmanage' %}';" value="Manage Databases" /></p>
+
+{% endif %}
+
+<p><input type="button" onclick="location.href='{% url 'browse' %}';" value="Browse" /></p>
+
+</body></html>
