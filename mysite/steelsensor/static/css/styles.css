@@ -22,3 +22,32 @@ p {
 select {
 	align-items: center;
 }
+
+ul {
+	list-style-type: none;
+}
+
+li {
+	text-align: center;
+	text-decoration: none;
+}
+
+.slidecontainer {
+    width: 30%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
