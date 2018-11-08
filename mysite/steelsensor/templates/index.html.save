@@ -1,0 +1,77 @@
+{% load static %}
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Steel Sensor</title>
+	<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+<div>
+	<h1>Steel Sensor</h1>
+	<h4> : A image comparison tool.</h4>
+</div>
+
+{% if user.is_authenticated %}
+
+<p>Congratulations! You are an authenticated user, {{ user.username }} !</p>
+
+<p><a href="{% url 'logout' %}">log out</a></p>
+
+{% else %}
+
+<p>You are a stranger!</p>
+
+<p><a href=/accounts/register>Register Here (Not Implemented)</a><p>
+
+<p><a href="{% url 'login' %}">log in</a></p>
+
+{% endif %}
+
+<p>SteelSensor Search Page</p>
+
+<p>Upload an image to compare. It will be added to the database.</p>
+
+<form action="{% url "results" %}" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p>{{ form.non_field_errors }}</p>
+	<p>{{ form.docfile.label_tag }} {{ form.docfile.help_text }}</p>
+	<p>
+		{{ form.docfile.errors }}
+		{{ form.docfile }}
+	</p>
+
+	{% if databases %}
+		<p>
+		<select name="dbSelect">
+       		 	{% for database in databases %}
+			<option value="{{ database }}">{{ database }}</option>
+		        {% endfor %}
+		</select>
+		</p>
+	{% else %}
+        	<p>No database selections avalailable.</p>
+	{% endif %}
+
+	{% if user.is_authenticated %}
+	<p><a href="/steelsensor/dbmanage">Manage Your Databases.</a></p>
+
+	{% endif %}
+	<p>
+	<select name="matchingThreshold">
+		<option value="10">90% Match</option>
+		<option value="20">80% Match</option>
+		<option value="30">70% Match</option>
+		<option value="40">60% Match</option>
+		<option value="50">50% Match</option>
+	</select>
+	</p>
+
+<p><input type="submit" value="Upload"/></p>
+	<p><input type="submit" value="Upload"/></p>
+</form>
+
+<p><a href="/steelsensor/browse">Browse Images</a></p>
+
+</body></html>
