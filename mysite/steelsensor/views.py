@@ -70,8 +70,9 @@ def results(request):
 				requesteddbName = request.POST['dbSelect']
 				requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
 				# print(requesteddbName, request.user.username, requestedDB)
-			except:
-				return HttpResponse("<html><body><p>There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions.</p><p><a href=/steelsensor>Go Home.</a></p></body></html>" % requesteddbName)
+			except Exception as ex:
+				# print(ex)
+				return render(request, 'error.html', {'errorCode': "There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions." % requesteddbName })
 
 
 			# Create thing and save file.
@@ -104,6 +105,7 @@ def results(request):
 			return render(request, 'error.html', {'errorCode': "Invalid Form Received." })
 
 		results = newImageModel.findMatches(dbMatchThreshold)
+		for x in results: print(x)
 	else:
 		results = []
 	return render(request, 'results.html', {'original' : str(newImageModel.docfile), 'results': [ str(x.docfile) for x in results]})
