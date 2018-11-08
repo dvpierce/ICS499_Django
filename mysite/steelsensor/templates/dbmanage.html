@@ -1,16 +1,44 @@
+{% load static %}
 <html>
 <head>
-	<meta charset="utf-8">
-	<title>I learned HTML in the '90s.</title>
+        <meta charset="utf-8">
+        <title>Steel Sensor</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 
 <body>
 
+<div>
+        <h1>Steel Sensor</h1>
+        <h4> : A image comparison tool.</h4>
+</div>
+
 {% if user.is_authenticated %}
 
-	<p>Congratulations! You are an authenticated user, {{ user.username }} !</p>
+<table class="topRight">
+        <tr>
+                <th><p class="greeting" >Hello {{ user.username }}!</p></th>
+                <th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th>
+        </tr>
+</table>
 
-	<p><a href="{% url 'logout' %}">log out</a></p>
+
+{% else %}
+
+<table class="topRight">
+        <tr>
+                <th><input type="button" onclick="location.href='/accounts/register';" value="Sign-up" /></th>
+
+                <th><input type="button" onclick="location.href='{% url 'login' %}';" value="Sign-in" /></th>
+        </tr>
+</table>
+
+{% endif %}
+
+
+{% if user.is_authenticated %}
+	
+	<br>
 
 	<p>Create a Database:</p>
 
@@ -24,12 +52,17 @@
 	</form>
 
 	{% if databases %}
-		<p>Your Databases:</p>
-		<ul>
+		
+	<br>
+
+	<p>Your Databases:</p>
+		<table align="center">
+		<tr>
 		{% for db in databases %}
-			<li>{{ db }} - <a href=/steelsensor/browse?db={{ db }}>Browse This DB</a> • <a href=/steelsensor/dbdelete?db={{ db }}>Delete This DB</a></li>
+			<th>{{ db }} <a href=/steelsensor/browse?db={{ db }}>Browse This DB</a> <a href=/steelsensor/dbdelete?db={{ db }}>Delete This DB</a></li></th>
 		{% endfor %}
-		</ul>
+		</tr>
+		</table>
 	{% endif %}
 
 {% else %}
@@ -40,8 +73,8 @@
 
 {% endif %}
 
-<p><a href="/steelsensor/browse">Browse Images</a></p>
+<p><input type="button" onclick="location.href='{% url 'browse' %}';" value="Browse" /></p>
 
-<p><a href="/steelsensor">Go Home</a></p>
+<p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
 
 </body></html>

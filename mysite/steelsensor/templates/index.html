@@ -18,9 +18,10 @@
 <table class="topRight">
         <tr>
                 <th><p class="greeting" >Hello {{ user.username }}!</p></th>
-		<th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th> 
-        </tr>
+		<th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th>
+	</tr>
 </table>
+
 
 {% else %}
 
@@ -40,7 +41,7 @@
 
 <p>Click Select to choose an image to upload:</p>
 
-<form action="{% url "results" %}" method="post" enctype="multipart/form-data">
+<form action="{% url "results" %}" method="post" enctype="multipart/form-data" align="center">
 	{% csrf_token %}
 	
 	<!-- <p>{{ form.non_field_errors }}</p>
@@ -52,7 +53,7 @@
 		{{ form.docfile }}
 	</p> 
 
-	{% if databases %}
+	{% if databases  %}
 		
 		<br>
 
@@ -75,7 +76,13 @@
 	<br>
 	
 	<p>Choose the minimum percent match you are looking for:</p>
-	
+
+	<!--<div class="slidecontainer" align="center">
+		<input type="range" min="1" max="100" value="50" class="slider" name="myRange" id="myRange" oninput="matchingThreshold.value = myRange.value"></p>
+		<output name="matchingThreshold" id="matchingThreshold">50</output>
+	</div>
+	-->	
+
 	<p>
 	<select name="matchingThreshold">
 		<option value="0">100%</option> 
@@ -90,6 +97,7 @@
 		<option value="90">10%</option>
 		<option value="100">0%</option>
 	</select>
+	
 	</p>
 	
 	<br>
@@ -98,13 +106,14 @@
 </form>
 
 <br>
+<br>
 
 {% if user.is_authenticated %}
 
-        <p><a href="/steelsensor/dbmanage">Manage Your Databases.</a></p>
+       <p><input type="button" onclick="location.href='{% url 'dbmanage' %}';" value="Manage Databases" /></p>
 
 {% endif %}
 
-<p><a href="/steelsensor/browse">Browse Images</a></p>
+<p><input type="button" onclick="location.href='{% url 'browse' %}';" value="Browse" /></p>
 
 </body></html>
