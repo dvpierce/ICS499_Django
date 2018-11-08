@@ -7,6 +7,7 @@ from django.urls import reverse
 
 from django.core.paginator import Paginator
 from django.core.files.storage import FileSystemStorage
+from django.core.files import File
 
 from steelsensor.models import ImageModel, UserDatabase
 from steelsensor.forms import DocumentForm, dbManageForm
@@ -26,7 +27,6 @@ from imagehash import whash, hex_to_hash
 # class ImageModel(models.Model):
 #	hash = models.CharField(max_length=16)
 #	path = models.TextField()
-#	randomKey = models.TextField(primary_key=True)
 #	docfile = models.FileField(
 #		upload_to='documents'+os.path.sep+'%Y'+os.path.sep+'%m'+os.path.sep+'%d',
 #		null=True
@@ -57,15 +57,41 @@ def zipHandler(request):
 	# Expand the zip file
 	ZipFileAbsPath = fs.location + os.path.sep + filename
 	ZipFileUnzipPath = fs.location + os.path.sep + "temp"
-	subprocess.call(["unzip", ZipFileAbsPath, "-d", ZipFileUnzipPath])
+	subprocess.call(["unzip", "-o", ZipFileAbsPath, "-d", ZipFileUnzipPath])
 
 	# Find all the files of allowable file types in the directory.
-	FileNames = [ fileName for fileName in os.listdir(ZipFileUnzipPath) if fileName.split('.')[-1].lower()in ValidFileTypes ]
-	print(FileNames)
+	FileNames = [ fileName for fileName in os.listdir(ZipFileUnzipPath) if fileName.split('.')[-1].lower() in ValidFileTypes ]
+	# print(FileNames)
 	FileAbsPaths = [ (ZipFileUnzipPath + os.path.sep + FileName) for FileName in FileNames ]
-	print(FileAbsPaths)
+	# print(FileAbsPaths)
+
+	# process each file.
+	for filePath in FileAbsPaths:
+		try:
+			# print(filePath)
+			with open(filePath, 'rb') as f:
+				# pass the file data and the filename to a Django File object.
+				djangofile = File(f, name=filePath.split(os.path.sep)[-1])
+				# Create a new ImageModel with the file object - this will observe the upload_to
+				# default and save a copy of the file in the /media/documents directory.
+				newImageModel = ImageModel(
+					docfile = djangofile,
+					dbName = request.POST['dbSelect'],
+					path = filePath.split(os.path.sep)[-1]
+				)
+				newImageModel.save()
+
+			# Add image hash
+			imageHashValue = whash(Image.open(newImageModel.docfile.path))
+			newImageModel.hash = str(imageHashValue)
+			newImageModel.save()
+		except Exception as ex:
+			# There was some kind of issue processing this particular file.
+			# Don't worry about it, just do the rest, if there are any.
+			continue
 
 	# clean up after self
+	print("Deleting temporary data")
 	subprocess.call(["rm", "-Rf", ZipFileUnzipPath])
 	subprocess.call(["rm", "-Rf", ZipFileAbsPath])
 	return
