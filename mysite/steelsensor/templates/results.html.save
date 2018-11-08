@@ -1,0 +1,38 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>I learned HTML in the '90s.</title>
+</head>
+
+<body>
+
+{% if user.is_a
+
+
+<p>Original photo:</p>
+
+{% if original %}
+
+<p><img src="/media/{{ original }}" width="200px"></p>
+
+{% endif %}
+
+<p>Matching Images:</p>
+
+{% if results %}
+	<ul>
+	{% for result in results %}
+		<li><a href="/media/{{ result }}"><img src="/media/{{ result }}" width=200px></a></li>
+                <a href=/steelsensor/browsematches?imgURL={{ result }}>Show similar images</a>&nbsp;
+                <a href=/steelsensor/deleteImage?imgURL={{ result }}>Delete this image</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	<p>No results or no image posted.</p>
+	<p><a href="/steelsensor">Go Home</a></p>
+{% endif %}
+
+<p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
+
+
+</body></html>
