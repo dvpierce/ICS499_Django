@@ -14,6 +14,7 @@ from steelsensor.forms import DocumentForm, dbManageForm
 import os
 import sys
 import random
+import subprocess
 
 from PIL import Image
 from imagehash import whash, hex_to_hash
@@ -39,25 +40,45 @@ from imagehash import whash, hex_to_hash
 #
 ################################################################################
 
+################################################################################
+# Utility functions and constants. One could argue that this should go in
+# a separate file, and one would probably be right.
+################################################################################
+
 ValidFileTypes = [ 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tif', 'tiff', 'zip' ]
+
+def zipHandler(request):
+	dbName = request.POST['dbSelect']
+	zipFile = request.FILES['docfile']
+	fs = FileSystemStorage()
+	# Save the zip file to local file system.
+	filename = fs.save(zipFile.name, zipFile)
+
+	# Expand the zip file
+	ZipFileAbsPath = fs.location + os.path.sep + filename
+	ZipFileUnzipPath = fs.location + os.path.sep + "temp"
+	subprocess.call(["unzip", ZipFileAbsPath, "-d", ZipFileUnzipPath])
+
+	# Find all the files of allowable file types in the directory.
+	FileNames = [ fileName for fileName in os.listdir(ZipFileUnzipPath) if fileName.split('.')[-1].lower()in ValidFileTypes ]
+	print(FileNames)
+	FileAbsPaths = [ (ZipFileUnzipPath + os.path.sep + FileName) for FileName in FileNames ]
+	print(FileAbsPaths)
+
+	# clean up after self
+	subprocess.call(["rm", "-Rf", ZipFileUnzipPath])
+	subprocess.call(["rm", "-Rf", ZipFileAbsPath])
+	return
+
+################################################################################
+# Views
+################################################################################
 
 def index(request):
 	form = DocumentForm()
 	documents = []
 	databases = [ "main" ] + [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
 	return render(request, 'index.html', {'documents': documents, 'form': form, 'databases': databases})
-
-def zipHandler(request):
-	dbName = request.POST['dbSelect']
-	zipFile = request.FILES['docfile']
-	fs = FileSystemStorage()
-	filename = fs.save(zipFile.name, zipFile)
-	print(filename)
-	print(fs.url(filename))
-	print(fs.location)
-	FileAbsPath = fs.location + os.path.sep + filename
-	print(FileAbsPath)
-	return
 
 def results(request):
 	if request.method == 'POST':
@@ -66,14 +87,16 @@ def results(request):
 		if form.is_valid():
 
 			# Check if user has r/w permissions on database.
-			try:
-				requesteddbName = request.POST['dbSelect']
-				requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
-				# print(requesteddbName, request.user.username, requestedDB)
-			except Exception as ex:
-				# print(ex)
-				return render(request, 'error.html', {'errorCode': "There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions." % requesteddbName })
-
+			# If the current user is admin and they've selected the "main" database, it's a special case
+			# that is foolishly not included in our database model.
+			if not ( request.POST['dbSelect'] == "main" and request.user.username == "admin" ):
+				try:
+					requesteddbName = request.POST['dbSelect']
+					requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
+					# print(requesteddbName, request.user.username, requestedDB)
+				except Exception as ex:
+					# print(ex)
+					return render(request, 'error.html', {'errorCode': "There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions." % requesteddbName })
 
 			# Create thing and save file.
 			thisDocfile = request.FILES['docfile']
