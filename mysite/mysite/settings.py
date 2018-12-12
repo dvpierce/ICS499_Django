@@ -126,3 +126,6 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = '/steelsensor/'
 LOGOUT_REDIRECT_URL = '/steelsensor/'
+
+REGISTRATION_OPEN = True
+
