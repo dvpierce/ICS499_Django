@@ -111,15 +111,23 @@ def results(request):
 		dbMatchThreshold=30
 		form = DocumentForm(request.POST, request.FILES)
 		if form.is_valid():
+			# If the current user is the UnAuth'd user, show the "main" database, but set a flag to delete the image later.
+			if str(request.user) == "AnonymousUser": UserAnon = True
+			else: UserAnon = False
+
+			# Interestingly, for unauthenticated users, while request.user has a String value of "AnonymousUser",
+			# request.user.username has a null string value. This is annoying.
 
 			# Check if user has r/w permissions on database.
 			# If the current user is admin and they've selected the "main" database, it's a special case
 			# that is foolishly not included in our database model.
-			if not ( request.POST['dbSelect'] == "main" and request.user.username == "admin" ):
+			if not ( request.POST['dbSelect'] == "main" and ( request.user.username in [ "admin", "" ] ) ):
 				try:
+					# Check to make sure that the currently logged in user owns the requested database.
 					requesteddbName = request.POST['dbSelect']
 					requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
 					# print(requesteddbName, request.user.username, requestedDB)
+				# If the logged in user does NOT own the currently selected database, return an error.
 				except Exception as ex:
 					# print(ex)
 					return render(request, 'error.html', {'errorCode': "There was an error accessing the requested database: %s. Either it does not exist or you do not have write permissions." % requesteddbName })
@@ -150,14 +158,24 @@ def results(request):
 			except:
 				pass
 
+			# Find matches
+			results = newImageModel.findMatches(dbMatchThreshold)
+
+			# if the current user is anonymous, delete the newImageModel from the database immediately.
+			if UserAnon:
+				# Delete file from local file system and database
+				localPath = newImageModel.docfile.path
+				os.remove(localPath)
+				newImageModel.delete()
+				return render(request, 'results.html', {'original' : "../favicon.ico", 'results': [ str(x.docfile) for x in results]})
+			else:
+				return render(request, 'results.html', {'original' : str(newImageModel.docfile), 'results': [ str(x.docfile) for x in results]})
 		else:
 			return render(request, 'error.html', {'errorCode': "Invalid Form Received." })
 
-		results = newImageModel.findMatches(dbMatchThreshold)
-		for x in results: print(x)
 	else:
 		results = []
-	return render(request, 'results.html', {'original' : str(newImageModel.docfile), 'results': [ str(x.docfile) for x in results]})
+		return render(request, 'results.html', {'original' : "../favicon.ico", 'results': [ str(x.docfile) for x in results]})
 
 def browse(request):
 	page = request.GET.get('p', '')
@@ -178,10 +196,10 @@ def browse(request):
 	# Or restrict to provided search pattern.
 
 	if db:
+		print(db, "requested")
 		databases = [ db ]
 	else:
-		databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ]
-		if str(request.user) in "admin": databases.append("main")
+		databases = [ x.dbName for x in UserDatabase.objects.filter(dbOwner=request.user) ] + [ "main" ]
 
 	allImages = ImageModel.objects.filter(dbName__in=databases)
 	pagedImages = Paginator(allImages, maxPage)
@@ -216,6 +234,16 @@ def browsematches(request):
 def deleteImage(request):
 	# Find the image requested
 	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
+
+	# Verify that user has r/w on this database.
+	try:
+		requesteddbName = searchImage.dbName
+		requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
+	except:
+		# Error condition: the database with name ___ is not owned by the requesting user.
+		return render(request, 'error.html', {'errorCode' : "You do not have permission to delete this image." })
+
+
 	# Delete file from local file system
 	localPath = searchImage.docfile.path
 	os.remove(localPath)
