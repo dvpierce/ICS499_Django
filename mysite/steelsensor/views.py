@@ -229,7 +229,9 @@ def browse(request):
 
 def browsematches(request):
 	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
-	results = searchImage.findMatches(30)
+	searchThreshold = int(request.GET.get('match', '30'))
+	print("Matching threshold = ", searchThreshold)
+	results = searchImage.findMatches(searchThreshold)
 
 	return render(request, 'browsematches.html', {'original' : str(searchImage.docfile), 'matches' : [ str(x.docfile) for x in results ] })
 
