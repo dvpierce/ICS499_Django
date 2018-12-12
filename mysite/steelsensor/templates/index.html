@@ -101,12 +101,20 @@
 	</p>
 	
 	<br>
+	
+	{% if user.is_authenticated %}
 
-	<p><input type="submit" value="Upload and Compare"/></p>
+		<p><input type="submit" value="Upload and Compare"/></p>
+		<br>
+		<br>
+
+	{% else %}
+
+		<p><input type="submit" value="Compare"/></p>
+	
+	{% endif %}
 </form>
 
-<br>
-<br>
 
 {% if user.is_authenticated %}
 

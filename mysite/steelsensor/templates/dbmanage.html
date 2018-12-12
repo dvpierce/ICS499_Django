@@ -1,3 +1,4 @@
+
 {% load static %}
 <html>
 <head>
@@ -42,7 +43,7 @@
 
 	<p>Create a Database:</p>
 
-	<form action="{% url "dbmanage" %}" method="post" enctype="multipart/form-data">
+	<form border="1" action="{% url "dbmanage" %}" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
 	
 	        <p>{{ form.non_field_errors }}</p>
@@ -52,17 +53,24 @@
 	</form>
 
 	{% if databases %}
-		
-	<br>
 
-	<p>Your Databases:</p>
-		<table align="center">
-		<tr>
+		<table align="center" >
+		<tr><th colspan="2" >Your Databases:<br><br></th></tr>
+		
 		{% for db in databases %}
-			<th>{{ db }} <a href=/steelsensor/browse?db={{ db }}>Browse This DB</a> <a href=/steelsensor/dbdelete?db={{ db }}>Delete This DB</a></li></th>
+			<tr>
+				<th> {{ db }} </th>
+				<th>
+					 <input type="button" onclick="location.href='/steelsensor/browse?db={{ db }}';" value="Browse" />  
+					<input type="button" onclick="location.href='/steelsensor/dbdelete?db={{ db }}';" value="Delete" />
+				</th>
+
+			</tr>
+			<tr></tr>
+			<br>
 		{% endfor %}
-		</tr>
 		</table>
+		<br>
 	{% endif %}
 
 {% else %}
@@ -73,6 +81,7 @@
 
 {% endif %}
 
+<br>
 <p><input type="button" onclick="location.href='{% url 'browse' %}';" value="Browse" /></p>
 
 <p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>

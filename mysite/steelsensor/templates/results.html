@@ -40,25 +40,48 @@
 
 {% if original %}
 
-<p><img src="/media/{{ original }}" width="200px"></p>
+	<p><a href="/media/{{ result }}"><img src="/media/{{ original }}" width="200px"></a></p>
 
 {% endif %}
 
 <p>Matching Images:</p>
 
 {% if results %}
+	<p>
+        {% if prevPageLink %}
+                <input type="button" onclick="location.href='/steelsensor/browse{{ prevPageLink }}';" value="<<$
+        {% endif %}
+        {% if pageNum %}
+                {{ pageNum }}
+        {% endif %}
+        {% if nextPageLink %}
+                &nbsp;<input type="button" onclick="location.href='/steelsensor/browse{{ nextPageLink }}';" val$
+        {% endif %}
+        </p>
+
 	<ul>
 	{% for result in results %}
-		<li><a href="/media/{{ result }}"><img src="/media/{{ result }}" width=200px></a></li>
-                <a href=/steelsensor/browsematches?imgURL={{ result }}>Show similar images</a>&nbsp;
-                <a href=/steelsensor/deleteImage?imgURL={{ result }}>Delete this image</a></li>
+		<li>
+		
+		<br><a href="/media/{{ result }}"><img src="/media/{{ result }}" width="200px"></a><br>
+		
+             
+		{% if user.is_authenticated %}
+                        <input type="button" onclick="location.href='/steelsensor/browsematches?imgURL={{ result }}';" value="Similar Images" />&nbsp;
+                        <input type="button" onclick="location.href='/steelsensor/deleteImage?imgURL={{ result }}';" value="Delete Image" /><br>
+                {% else %}
+                        <input type="button" onclick="location.href='/steelsensor/browsematches?imgURL={{ result }}';" value="Similar Images" />&nbsp;
+                {% endif %}
+		
+		</li>
+
 	{% endfor %}
 	</ul>
 {% else %}
 	<p>No results or no image posted.</p>
 {% endif %}
 
-<p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
+<br><p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
 
 
 </body></html>
