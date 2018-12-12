@@ -1,26 +1,43 @@
+{% load static %}
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>I learned HTML in the '90s.</title>
+	<title>Steel Sensor</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
 </head>
 
 <body>
 
+<div>
+        <h1>Steel Sensor</h1>
+        <h4> : A image comparison tool.</h4>
+</div>
+
 {% if user.is_authenticated %}
 
-<p>Congratulations! You are an authenticated user, {{ user.username }} !</p>
-
-<p><a href="{% url 'logout' %}">log out</a></p>
+<table class="topRight">
+        <tr>
+                <th><p class="greeting" >Hello {{ user.username }}!</p></th>
+                <th><input type="button" onclick="location.href='{% url 'logout' %}';" value="Logout" /></th>
+        </tr>
+</table>
 
 {% else %}
 
-<p>You are a stranger!</p>
+<table class="topRight">
+        <tr>
+                <th><input type="button" onclick="location.href='/accounts/register';" value="Sign-up" /></th>
 
-<p><a href="{% url 'login' %}">log in</a></p>
+                <th><input type="button" onclick="location.href='{% url 'login' %}';" value="Sign-in" /></th>
+        </tr>
+</table>
+
 
 {% endif %}
 
-<p>SteelSensor BrowseMatches</p>
+
+<p>SteelSensor Browse Matches</p>
 
 <p>Original photo:</p>
 
@@ -33,17 +50,40 @@
 <p>Matching Images:</p>
 
 {% if matches %}
+	<p>
+        {% if prevPageLink %}
+                <input type="button" onclick="location.href='/steelsensor/browse{{ prevPageLink }}';" value="<<<" />&nbsp;
+        {% endif %}
+        {% if pageNum %}
+                {{ pageNum }}
+        {% endif %}
+        {% if nextPageLink %}
+                &nbsp;<input type="button" onclick="location.href='/steelsensor/browse{{ nextPageLink }}';" value=">>>" />
+        {% endif %}
+        </p>
+
+
 	<ul>
 	{% for match in matches %}
-		<li><a href="/media/{{ match }}"><img src="/media/{{ match }}" width="200px"></a></li>
-                <a href=/steelsensor/browsematches?imgURL={{ match }}>Show similar images</a>&nbsp;
-                <a href=/steelsensor/deleteImage?imgURL={{ match }}>Delete this image</a></li>
+		<li>
+
+                <br><a href="/media/{{ match }}"><img src="/media/{{ match }}" width="200px"></a><br>
+
+                {% if user.is_authenticated %}
+                        <input type="button" onclick="location.href='/steelsensor/browsematches?imgURL={{ match }}';" value="Similar Images" />&nbsp;
+                        <input type="button" onclick="location.href='/steelsensor/deleteImage?imgURL={{ match }}';" value="Delete Image" /><br>
+                {% else %}
+                        <input type="button" onclick="location.href='/steelsensor/browsematches?imgURL={{ match }}';" value="Similar Images" />&nbsp;
+                {% endif %}
+
+                </li>
+
 	{% endfor %}
 	</ul>
 {% else %}
 	<p>No files avalailable.</p>
 {% endif %}
 
-<p><a href="/steelsensor">Go Home</a></p>
+<br><p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
 
 </body></html>

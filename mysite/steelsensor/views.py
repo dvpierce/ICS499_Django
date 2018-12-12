@@ -154,8 +154,10 @@ def results(request):
 			newImageModel.save()
 
 			try:
-				dbMatchThreshold = int(request.POST['matchingThreshold'])
+				dbMatchThreshold = 100 - int(request.POST['matchingThreshold'])
+				print("Hello!", dbMatchThreshold)
 			except:
+				print("there was an error retrieving the matchingThreshold")
 				pass
 
 			# Find matches
