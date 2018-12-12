@@ -233,15 +233,19 @@ def browsematches(request):
 
 def deleteImage(request):
 	# Find the image requested
-	searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
+	try:
+		searchImage = ImageModel.objects.get(docfile = request.GET.get('imgURL', ''))
+		requesteddbName = searchImage.dbName
+	except:
+		return render(request, 'error.html', {'errorCode' : "Image not found."})
 
 	# Verify that user has r/w on this database.
-	try:
-		requesteddbName = searchImage.dbName
-		requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
-	except:
-		# Error condition: the database with name ___ is not owned by the requesting user.
-		return render(request, 'error.html', {'errorCode' : "You do not have permission to delete this image." })
+	if not ( (request.user.username in "admin") and (requesteddbName in "main") ):
+		try:
+			requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = requesteddbName)
+		except:
+			# Error condition: the database with name ___ is not owned by the requesting user.
+			return render(request, 'error.html', {'errorCode' : "You do not have permission to delete this image." })
 
 
 	# Delete file from local file system
@@ -251,7 +255,8 @@ def deleteImage(request):
 	# Delete the imageModel
 	searchImage.delete()
 
-	return HttpResponse("<html><body><p>Deleted "+localPath+"</p><p><a href=/steelsensor/>Go Home</a></p><body></html>")
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
+	# return HttpResponse("<html><body><p>Deleted "+localPath+"</p><p><a href=/steelsensor/>Go Home</a></p><body></html>")
 
 def admintools(request):
 	if request.user.is_authenticated:
