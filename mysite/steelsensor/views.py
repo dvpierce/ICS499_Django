@@ -275,8 +275,26 @@ def dbmanage(request):
 
 def dbdelete(request):
 	dbToDelete = request.GET.get('db','')
-
 	# print(dbToDelete)
+
+	# Verify that user has r/w on this database.
+	try:
+		requestedDB = UserDatabase.objects.get(dbOwner = request.user.username, dbName = dbToDelete)
+	except:
+		# Error condition: the database with name ___ is not owned by the requesting user.
+		return render(request, 'error.html', {'errorCode' : "You do not have permission to delete this database." })
+
+	# Delete all images with this database name
+	for dbImg in ImageModel.objects.filter(dbName=dbToDelete):
+		# Delete file from local file system
+		localPath = searchImage.docfile.path
+		os.remove(localPath)
+		print("Deleting " + localPath)
+		# Delete the imageModel
+		searchImage.delete()
+
+	requestedDB.delete()
+	# print("Database deleted")
 
 	return redirect('dbmanage')
 
