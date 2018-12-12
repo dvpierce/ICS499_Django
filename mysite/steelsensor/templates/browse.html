@@ -41,26 +41,32 @@
 {% if documents %}
 	<p>
 	{% if prevPageLink %}
-		<a href=/steelsensor/browse{{ prevPageLink }}><---</a>&nbsp;
+		<input type="button" onclick="location.href='/steelsensor/browse{{ prevPageLink }}';" value="<<<" />&nbsp;
 	{% endif %}
 	{% if pageNum %}
 		{{ pageNum }}
 	{% endif %}
-	{% if nextPageLink %}
-		&nbsp;<a href=/steelsensor/browse{{ nextPageLink }}>---></a>
+	{% if nextPageLink %} 
+		&nbsp;<input type="button" onclick="location.href='/steelsensor/browse{{ nextPageLink }}';" value=">>>" />
 	{% endif %}
 	</p>
 	<ul>
 	{% for document in documents %}
-		<li><a href="/media/{{ document }}"><img src="/media/{{ document }}" width="200px"></a><br>
-		<a href=/steelsensor/browsematches?imgURL={{ document }}>Show similar images</a>&nbsp;
-		<a href=/steelsensor/deleteImage?imgURL={{ document }}>Delete this image</a></li>
+		<li>
+
+		<br><a href="/media/{{ document }}"><img src="/media/{{ document }}" width="250px"></a><br>
+		
+		<input type="button" onclick="location.href='/steelsensor/browsematches?imgURL={{ document }}';" value="Similar Images" />&nbsp;
+		<input type="button" onclick="location.href='/steelsensor/deleteImage?imgURL={{ document }}';" value="Delete Image" /><br>
+
+		</li>
+
 	{% endfor %}
 	</ul>
 {% else %}
-	<p>No files avalailable.</p>
+	<p>No files available.</p>
 {% endif %}
 
-<p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
+<br><p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
 
 </body></html>
