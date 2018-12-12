@@ -26,7 +26,7 @@ class ImageModel(models.Model):
 			a = hex_to_hash(Image.hash)
 			b = hex_to_hash(theHash)
 			difference = 100*(a - b)/(len(a.hash)**2)
-			if(difference < maxDiff):
+			if (difference < maxDiff) and (self.id != Image.id):
 				results.append(Image)
 		return results
 
