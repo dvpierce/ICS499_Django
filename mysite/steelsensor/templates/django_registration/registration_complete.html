@@ -1,6 +1,27 @@
+{% load static %}
 <html>
+<head>
+        <meta charset="utf-8">
+        <title>Steel Sensor</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
 <body>
-<p>Registration Complete!</p>
-<p><A HREF="/steelsensor">Go Home</a></p>
+
+<div>
+        <h1>Steel Sensor</h1>
+        <h4> : A image comparison tool.</h4>
+</div>
+
+<table class="topRight">
+        <tr>
+                <th><input type="button" onclick="location.href='{% url 'login' %}';" value="Sign-in" /></th>
+        </tr>
+</table>
+
+<div align="center"><br><br><h4>Registration completed successfully!</h4></div>
+
+<br><p><input type="button" onclick="location.href='{% url 'index' %}';" value="Home" /></p>
+
 </body>
 </html>

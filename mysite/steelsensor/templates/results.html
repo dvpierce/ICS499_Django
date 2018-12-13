@@ -36,9 +36,8 @@
 {% endif %}
 
 
-<p>Original photo:</p>
-
-{% if original %}
+{% if original and user.is_authenticated %}
+	<p>Original photo:</p>
 
 	<p><a href="/media/{{ result }}"><img src="/media/{{ original }}" width="200px"></a></p>
 

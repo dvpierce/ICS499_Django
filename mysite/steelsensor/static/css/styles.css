@@ -20,6 +20,10 @@ p {
 	text-align: center;
 }
 
+form {
+	text-align: left;
+}
+
 select {
 	align-items: center;
 }
@@ -35,7 +39,5 @@ li {
 	margin: 0 auto;
 }
 
-datalist {
-	display: contents;
-}
+
 
